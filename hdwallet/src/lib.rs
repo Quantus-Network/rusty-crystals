@@ -9,6 +9,7 @@ use sha2::Sha512;
 use sha2::digest::FixedOutput;
 
 mod tests;
+mod test_vectors;
 
 #[derive(Debug, thiserror::Error)]
 pub enum HDLatticeError {
@@ -20,6 +21,8 @@ pub enum HDLatticeError {
     BadEntropyBitCount(usize),
     #[error("Mnemonic derivation failed: {0}")]
     MnemonicDerivationFailed(String),
+    #[error("Invalid wormhole path: {0}")]
+    InvalidWormholePath(String),
 }
 
 /// Manages entropy generation for HD wallets
@@ -79,8 +82,27 @@ impl HDLattice {
         if path.is_empty() {
             return Ok(self.master_key);
         }
-        let entries = path.split('/');
+
+        // Check if this is a wormhole path
+        let (is_wormhole, remaining_path) = if path.starts_with("w/") {
+            (true, &path[2..])
+        } else {
+            (false, path)
+        };
+
+        let entries = remaining_path.split('/');
         let mut entropy = self.master_key.clone();
+
+        // For wormhole paths, we use a different salt to ensure separation
+        if is_wormhole {
+            let mut hasher = hmac::Hmac::<Sha512>::new_from_slice(b"Wormhole seed").map_err(|_| {
+                HDLatticeError::KeyDerivationFailed("Failed to create HMAC".to_string())
+            })?;
+            hasher.update(&entropy);
+            entropy = hasher.finalize_fixed().into();
+        }
+
+        // Continue with normal derivation
         for (_, c) in entries.into_iter().enumerate() {
             let mut child_index = c
                 .parse::<u32>()
