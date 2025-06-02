@@ -1,5 +1,6 @@
 use bip39::{Language, Mnemonic};
 use hmac::Mac;
+use poseidon_resonance::PoseidonHasher;
 use rand::RngCore;
 use rand::rngs::OsRng;
 use rand_chacha::ChaCha20Rng;
@@ -7,9 +8,16 @@ use rand_chacha::rand_core::{RngCore as ChaChaCore, SeedableRng};
 use rusty_crystals_dilithium::ml_dsa_87::Keypair;
 use sha2::Sha512;
 use sha2::digest::FixedOutput;
+use sp_core::Hasher;
 
-mod tests;
+#[cfg(test)]
 mod test_vectors;
+#[cfg(test)]
+mod tests;
+
+pub mod wormhole;
+
+pub use wormhole::{WormholeError, WormholePair};
 
 #[derive(Debug, thiserror::Error)]
 pub enum HDLatticeError {
@@ -76,7 +84,7 @@ impl HDLattice {
         Keypair::generate(Some(&derived_entropy.unwrap()))
     }
 
-    // Derives entropy from a seed along a given path
+    /// Derives entropy from a seed along a given path
     pub fn derive_entropy(&self, path: &str) -> Result<[u8; 64], HDLatticeError> {
         // If path is empty, return master seed
         if path.is_empty() {
@@ -95,9 +103,10 @@ impl HDLattice {
 
         // For wormhole paths, we use a different salt to ensure separation
         if is_wormhole {
-            let mut hasher = hmac::Hmac::<Sha512>::new_from_slice(b"Wormhole seed").map_err(|_| {
-                HDLatticeError::KeyDerivationFailed("Failed to create HMAC".to_string())
-            })?;
+            let mut hasher =
+                hmac::Hmac::<Sha512>::new_from_slice(b"Wormhole seed").map_err(|_| {
+                    HDLatticeError::KeyDerivationFailed("Failed to create HMAC".to_string())
+                })?;
             hasher.update(&entropy);
             entropy = hasher.finalize_fixed().into();
         }
@@ -132,6 +141,28 @@ impl HDLattice {
         hasher.update(&entropy[..32]);
         hasher.update(&index_buffer);
         hasher.finalize_fixed().into()
+    }
+
+    /// Generates a wormhole pair from the current entropy state
+    pub fn generate_wormhole_pair(&self) -> Result<WormholePair, HDLatticeError> {
+        let secret = PoseidonHasher::hash(&self.master_key[..32]);
+        Ok(WormholePair::generate_pair_from_secret(&secret.0))
+    }
+
+    /// Generates a wormhole pair from a specific path
+    pub fn generate_wormhole_pair_from_path(
+        &self,
+        path: &str,
+    ) -> Result<WormholePair, HDLatticeError> {
+        if !path.starts_with("w/") {
+            return Err(HDLatticeError::InvalidWormholePath(
+                "Path must start with 'w/' for wormhole addresses".to_string(),
+            ));
+        }
+
+        let entropy = self.derive_entropy(path)?;
+        let secret = PoseidonHasher::hash(&entropy[..32]);
+        Ok(WormholePair::generate_pair_from_secret(&secret.0))
     }
 }
 
