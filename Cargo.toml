@@ -1,22 +1,7 @@
 [workspace]
-members = [
-    "hdwallet",
-    "dilithium"
-]
+members = ["rusty-crystals-dilithium", "rusty-crystals-hdwallet"]
+resolver = "2"
 
 [workspace.dependencies]
 thiserror = "2.0.4"
-
-[package]
-name = "rusty-crystals"
-version = "0.1.1"
-edition = "2021"
-
-[lib]
-name = "rusty_crystals"
-crate-type = ["lib"]
-
-[dependencies]
-rusty-crystals-dilithium = { path = "./dilithium" }
-rusty-crystals-hdwallet = { path = "./hdwallet" }
 getrandom = { version = "0.2", features = ["js"] }

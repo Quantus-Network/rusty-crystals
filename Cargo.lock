@@ -2254,15 +2254,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f7c45b9784283f1b2e7fb61b42047c2fd678ef0960d4f6f1eba131594cc369d4"
 
 [[package]]
-name = "rusty-crystals"
-version = "0.1.1"
-dependencies = [
- "getrandom 0.2.15",
- "rusty-crystals-dilithium",
- "rusty-crystals-hdwallet",
-]
-
-[[package]]
 name = "rusty-crystals-dilithium"
 version = "1.0.0"
 dependencies = [
@@ -2276,6 +2267,7 @@ name = "rusty-crystals-hdwallet"
 version = "0.1.1"
 dependencies = [
  "bip39",
+ "getrandom 0.2.15",
  "hex-literal",
  "hmac 0.12.1",
  "poseidon-resonance",

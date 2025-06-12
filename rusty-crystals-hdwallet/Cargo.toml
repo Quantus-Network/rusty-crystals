@@ -1,10 +1,10 @@
 [package]
 name = "rusty-crystals-hdwallet"
 version = "0.1.1"
-edition = "2024"
+edition = "2021"
 
 [dependencies]
-rusty-crystals-dilithium = { path = "../dilithium" }
+rusty-crystals-dilithium = { path = "../rusty-crystals-dilithium" }
 rand_core = { version = "0.6.4", default-features = false }
 sha2 = { version = "0.10.8", default-features = false }
 hmac = { version = "0.12.1", default-features = false }
@@ -15,15 +15,12 @@ thiserror = { workspace = true }
 sp-core = { version = "35.0.0", default-features = false }
 poseidon-resonance = { git = "https://github.com/Quantus-Network/poseidon-resonance", default-features = false }
 hex-literal = "0.4.1"
+getrandom = { workspace = true }
 
 [dev-dependencies]
-hex-literal = { version="0.4.1", default-features = false }
+hex-literal = { version = "0.4.1", default-features = false }
 
 [features]
 default = ["std"]
-std = [
-    "sp-core/std",
-    "poseidon-resonance/std",
-    "rand/std",
-]
+std = ["sp-core/std", "poseidon-resonance/std", "rand/std"]
 no_std = []
