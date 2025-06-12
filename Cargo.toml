@@ -15,8 +15,8 @@ name = "rusty_crystals"
 crate-type = ["lib"]
 
 [features]
-no_std = ["rusty-crystals-dilithium/no_std"]
 default = ["rand"]
+no_std = ["rusty-crystals-dilithium/no_std", "rusty-crystals-hdwallet/no_std"]
 dilithium = ["dep:rusty-crystals-dilithium"]
 hdwallet = ["dep:rusty-crystals-hdwallet"]
 
