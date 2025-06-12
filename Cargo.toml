@@ -3,6 +3,7 @@ members = ["hdwallet", "dilithium"]
 
 [workspace.dependencies]
 thiserror = "2.0.4"
+rand = "0.7.3"
 
 [package]
 name = "rusty-crystals"
@@ -14,12 +15,13 @@ name = "rusty_crystals"
 crate-type = ["lib"]
 
 [features]
-default = []
+no_std = []
+default = ["rand"]
 dilithium = ["dep:rusty-crystals-dilithium"]
 hdwallet = ["dep:rusty-crystals-hdwallet"]
-no_std = ["rusty-crystals-dilithium/no_std", "rusty-crystals-hdwallet/no_std"]
 
 [dependencies]
+rand = { workspace = true, optional = true }
 rusty-crystals-dilithium = { path = "./dilithium", optional = true }
 rusty-crystals-hdwallet = { path = "./hdwallet", optional = true }
-getrandom = { version = "0.2", features = ["js"] }
+#getrandom = { version = "0.2", features = ["js"] }
