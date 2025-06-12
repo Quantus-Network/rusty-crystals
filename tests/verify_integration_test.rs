@@ -1,9 +1,13 @@
 // tests/verify_integration_test.rs
 
+#[cfg(feature = "dilithium")]
 mod helpers;
-use helpers::kat::{TestVector, parse_test_vectors};
+#[cfg(feature = "dilithium")]
+use helpers::kat::{parse_test_vectors, TestVector};
+#[cfg(feature = "dilithium")]
 use rusty_crystals_dilithium::ml_dsa_87::{Keypair, PUBLICKEYBYTES};
 
+#[cfg(feature = "dilithium")]
 fn keypair_from_test(test: &TestVector) -> Keypair {
     let total_len = test.sk.len() + test.pk.len();
     let mut result = vec![0; total_len];
@@ -12,6 +16,7 @@ fn keypair_from_test(test: &TestVector) -> Keypair {
     Keypair::from_bytes(&result)
 }
 
+#[cfg(feature = "dilithium")]
 #[test]
 fn test_nist_kat() {
     let kat_data = include_str!("../test_vectors/PQCsignKAT_Dilithium5.rsp");
@@ -26,6 +31,7 @@ fn test_nist_kat() {
 /// # Arguments
 ///
 /// * `test` - A reference to the `TestVector` struct containing all the necessary fields.
+#[cfg(feature = "dilithium")]
 fn verify_test_vector(test: &TestVector) {
     // Check if the fields have correct lengths
     assert_eq!(
@@ -39,11 +45,7 @@ fn verify_test_vector(test: &TestVector) {
         "Signed message length mismatch from test vector"
     );
     // Check public key length for Dilithium3
-    assert_eq!(
-        test.pk.len(),
-        PUBLICKEYBYTES,
-        "Public key length mismatch"
-    );
+    assert_eq!(test.pk.len(), PUBLICKEYBYTES, "Public key length mismatch");
 
     let signature = test.extract_signature();
 
@@ -52,12 +54,10 @@ fn verify_test_vector(test: &TestVector) {
     let keypair = keypair_from_test(test);
     let result = keypair.verify(&test.msg, &signature, None);
 
-    assert!(
-        result,
-        "Signature verification failed",
-    );
+    assert!(result, "Signature verification failed",);
 }
 
+#[cfg(feature = "dilithium")]
 #[test]
 fn test_verify_invalid_signature() {
     // Generate Dilithium keypair
@@ -73,16 +73,9 @@ fn test_verify_invalid_signature() {
     // Verify the signature with wrong key
     let result = keys_1.verify(&signature, message, None);
 
-    assert!(
-        !result,
-        "Expected verification to fail, but it succeeded"
-    );
+    assert!(!result, "Expected verification to fail, but it succeeded");
 
     let result = keys_3.verify(&signature, message, None);
 
-    assert!(
-        !result,
-        "Expected verification to fail, but it succeeded"
-    );
-
+    assert!(!result, "Expected verification to fail, but it succeeded");
 }

@@ -1,7 +1,9 @@
 // tests/sign_integration_tests.rs
 
-use rusty_crystals_hdwallet::{HDLattice, generate_mnemonic};
+#[cfg(all(feature = "dilithium", feature = "hdwallet"))]
+use rusty_crystals_hdwallet::{generate_mnemonic, HDLattice};
 
+#[cfg(all(feature = "dilithium", feature = "hdwallet"))]
 #[test]
 fn test_sign() {
     // Step 1: Generate a random mnemonic and derive Falcon keypair
@@ -20,8 +22,5 @@ fn test_sign() {
     // Step 4: Verify the signature using the public key
     let verify_result = dilithium_keypair.verify(message, &signature, None);
 
-    assert!(
-        verify_result,
-        "Signature verification failed",
-    );
+    assert!(verify_result, "Signature verification failed",);
 }
