@@ -24,4 +24,4 @@ hdwallet = ["dep:rusty-crystals-hdwallet"]
 rand = { workspace = true, optional = true }
 rusty-crystals-dilithium = { path = "./dilithium", optional = true }
 rusty-crystals-hdwallet = { path = "./hdwallet", optional = true }
-#getrandom = { version = "0.2", features = ["js"] }
+getrandom = { version = "0.2", features = ["js"] }
