@@ -16,12 +16,15 @@ crate-type = ["lib"]
 
 [features]
 default = ["rand"]
-no_std = ["rusty-crystals-dilithium/no_std", "rusty-crystals-hdwallet/no_std"]
-dilithium = ["dep:rusty-crystals-dilithium"]
-hdwallet = ["dep:rusty-crystals-hdwallet"]
+no_std = [
+    "rusty-crystals-hdwallet/no_std",
+    "rusty-crystals-dilithium/no_std"
+]
+dilithium = ["rusty-crystals-dilithium"]
+hdwallet = ["rusty-crystals-hdwallet"]
 
 [dependencies]
 rand = { workspace = true, optional = true }
-rusty-crystals-dilithium = { path = "./dilithium", optional = true }
-rusty-crystals-hdwallet = { path = "./hdwallet", optional = true }
+rusty-crystals-dilithium = { path = "./dilithium", optional = true, default-features = false }
+rusty-crystals-hdwallet = { path = "./hdwallet", optional = true, default-features = false }
 getrandom = { version = "0.2", features = ["js"] }
