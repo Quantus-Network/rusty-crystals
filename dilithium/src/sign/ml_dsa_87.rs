@@ -10,6 +10,8 @@ const L: usize = params::ml_dsa_87::L;
 #[cfg(feature = "no_std")]
 extern crate alloc; // this makes Vec work
 #[cfg(feature = "no_std")]
+use alloc::boxed::Box;
+#[cfg(feature = "no_std")]
 use alloc::vec::Vec;
 /// Generate public and private key.
 ///
@@ -46,18 +48,18 @@ pub fn keypair(pk: &mut [u8], sk: &mut [u8], seed: Option<&[u8]>) {
     let mut key = [0u8; params::SEEDBYTES];
     key.copy_from_slice(&seedbuf[params::SEEDBYTES + params::CRHBYTES..]);
 
-    let mut s1 = Polyvecl::default();
+    let mut s1 = Box::new(Polyvecl::default());
     polyvec::lvl5::l_uniform_eta(&mut s1, &rhoprime, 0);
 
-    let mut s2 = Polyveck::default();
+    let mut s2 = Box::new(Polyveck::default());
     polyvec::lvl5::k_uniform_eta(&mut s2, &rhoprime, L as u16);
 
-    let mut s1hat = s1;
+    let mut s1hat = s1.clone();
     polyvec::lvl5::l_ntt(&mut s1hat);
 
-    let mut t1 = Polyveck::default();
+    let mut t1 = Box::new(Polyveck::default());
     for i in 0..K {
-        let mut row = Polyvecl::default();
+        let mut row = Box::new(Polyvecl::default());
         for j in 0..L {
             poly::uniform(&mut row.vec[j], &rho, ((i << 8) + j) as u16);
         }
@@ -69,7 +71,7 @@ pub fn keypair(pk: &mut [u8], sk: &mut [u8], seed: Option<&[u8]>) {
     polyvec::lvl5::k_add(&mut t1, &s2);
     polyvec::lvl5::k_caddq(&mut t1);
 
-    let mut t0 = Polyveck::default();
+    let mut t0 = Box::new(Polyveck::default());
     polyvec::lvl5::k_power2round(&mut t1, &mut t0);
 
     packing::ml_dsa_87::pack_pk(pk, &rho, &t1);
@@ -238,12 +240,10 @@ pub fn verify(sig: &[u8], m: &[u8], pk: &[u8]) -> bool {
     let mut c = [0u8; params::ml_dsa_87::C_DASH_BYTES];
     let mut c2 = [0u8; params::ml_dsa_87::C_DASH_BYTES];
     let mut cp = Poly::default();
-    let mut z = Polyvecl::default();
-    let (mut t1, mut w1, mut h) = (
-        Polyveck::default(),
-        Polyveck::default(),
-        Polyveck::default(),
-    );
+    let mut z = Box::new(Polyvecl::default());
+    let mut t1 = Box::new(Polyveck::default());
+    let mut w1 = Box::new(Polyveck::default());
+    let mut h = Box::new(Polyveck::default());
     let mut state = fips202::KeccakState::default(); // shake256_init()
 
     if sig.len() != crate::params::ml_dsa_87::SIGNBYTES {
@@ -282,7 +282,7 @@ pub fn verify(sig: &[u8], m: &[u8], pk: &[u8]) -> bool {
     polyvec::lvl5::k_ntt(&mut t1);
 
     for i in 0..K {
-        let mut row = Polyvecl::default();
+        let mut row = Box::new(Polyvecl::default());
         for j in 0..L {
             poly::uniform(&mut row.vec[j], &rho, ((i << 8) + j) as u16);
         }
