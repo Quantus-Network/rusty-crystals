@@ -238,7 +238,7 @@ pub fn verify(sig: &[u8], m: &[u8], pk: &[u8]) -> bool {
     let mut c = [0u8; params::ml_dsa_87::C_DASH_BYTES];
     let mut c2 = [0u8; params::ml_dsa_87::C_DASH_BYTES];
     let mut cp = Poly::default();
-    let (mut mat, mut z) = ([Polyvecl::default(); K], Polyvecl::default());
+    let mut z = Polyvecl::default();
     let (mut t1, mut w1, mut h) = (
         Polyveck::default(),
         Polyveck::default(),
@@ -276,14 +276,20 @@ pub fn verify(sig: &[u8], m: &[u8], pk: &[u8]) -> bool {
 
     // Matrix-vector multiplication; compute Az - c2^dt1
     poly::ml_dsa_87::challenge(&mut cp, &c);
-    polyvec::lvl5::matrix_expand(&mut mat, &rho);
 
     polyvec::lvl5::l_ntt(&mut z);
-    polyvec::lvl5::matrix_pointwise_montgomery(&mut w1, &mat, &z);
-
-    poly::ntt(&mut cp);
     polyvec::lvl5::k_shiftl(&mut t1);
     polyvec::lvl5::k_ntt(&mut t1);
+
+    for i in 0..K {
+        let mut row = Polyvecl::default();
+        for j in 0..L {
+            poly::uniform(&mut row.vec[j], &rho, ((i << 8) + j) as u16);
+        }
+        polyvec::lvl5::l_pointwise_acc_montgomery(&mut w1.vec[i], &row, &z);
+    }
+
+    poly::ntt(&mut cp);
     let t1_2 = t1.clone();
     polyvec::lvl5::k_pointwise_poly_montgomery(&mut t1, &cp, &t1_2);
 
