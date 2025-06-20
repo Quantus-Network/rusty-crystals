@@ -1,7 +1,11 @@
 use sha2::{Sha256, Sha512, Digest};
 
-#[cfg(feature = "no_std")]
+#[cfg(not(feature = "std"))]
 use alloc::{vec, vec::Vec};
+
+use crate::{
+    fips202::*, ntt::*, packing::*, poly::*, polyvec::*, reduce::*, rounding::*, sign::*,
+};
 
 pub const SECRETKEYBYTES: usize = crate::params::ml_dsa_44::SECRETKEYBYTES;
 pub const PUBLICKEYBYTES: usize = crate::params::ml_dsa_44::PUBLICKEYBYTES;
@@ -11,13 +15,13 @@ pub const KEYPAIRBYTES: usize = SECRETKEYBYTES + PUBLICKEYBYTES;
 pub type Signature = [u8; SIGNBYTES];
 
 /// A pair of private and public keys.
-#[cfg(not(feature = "no_std"))]
+#[cfg(feature = "std")]
 pub struct Keypair {
     pub secret: SecretKey,
     pub public: PublicKey
 }
 
-#[cfg(not(feature = "no_std"))]
+#[cfg(feature = "std")]
 impl Keypair {
     /// Generate a Keypair instance.
     /// 
@@ -108,12 +112,12 @@ impl Keypair {
 }
 
 /// Private key.
-#[cfg(not(feature = "no_std"))]
+#[cfg(feature = "std")]
 pub struct SecretKey {
     pub bytes: [u8; SECRETKEYBYTES]
 }
 
-#[cfg(not(feature = "no_std"))]
+#[cfg(feature = "std")]
 impl SecretKey {
     /// Returns a copy of underlying bytes.
     pub fn to_bytes(&self) -> [u8; SECRETKEYBYTES] {
@@ -335,7 +339,7 @@ impl PublicKey {
 }
 
 #[cfg(test)]
-#[cfg(not(feature = "no_std"))]
+#[cfg(feature = "std")]
 mod tests {
     use super::Keypair;
     #[test]

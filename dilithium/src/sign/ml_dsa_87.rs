@@ -2,9 +2,9 @@ use crate::{fips202, packing, params, poly, poly::Poly, polyvec, polyvec::lvl5::
 const K: usize = params::ml_dsa_87::K;
 const L: usize = params::ml_dsa_87::L;
 
-#[cfg(feature = "no_std")]
+#[cfg(not(feature = "std"))]
 extern crate alloc; // this makes Vec work
-#[cfg(feature = "no_std")]
+#[cfg(not(feature = "std"))]
 use alloc::vec::Vec;
 /// Generate public and private key.
 /// 
@@ -18,9 +18,9 @@ pub fn keypair(pk: &mut [u8], sk: &mut [u8], seed: Option<&[u8]>) {
     match seed {
         Some(x) => init_seed = x.to_vec(),
         None => {
-            #[cfg(feature = "no_std")]
+            #[cfg(not(feature = "std"))]
             unimplemented!("must provide entropy in verifier only mode");
-            #[cfg(not(feature = "no_std"))]
+            #[cfg(feature = "std")]
             {
             init_seed = vec![0u8; params::SEEDBYTES];
             crate::random_bytes(&mut init_seed, params::SEEDBYTES)
@@ -100,9 +100,9 @@ pub fn signature(sig: &mut [u8], msg: &[u8], sk: &[u8], hedged: bool) {
 
     let mut rnd = [0u8; params::SEEDBYTES];
     if hedged {
-        #[cfg(not(feature = "no_std"))]
+        #[cfg(feature = "std")]
         crate::random_bytes(&mut rnd, params::SEEDBYTES);
-        #[cfg(feature = "no_std")]
+        #[cfg(not(feature = "std"))]
         unimplemented!("hedged mode doesn't work in verifier only mode");
 
     }
@@ -281,7 +281,7 @@ pub fn verify(sig: &[u8], m: &[u8], pk: &[u8]) -> bool {
 }
 
 #[cfg(test)]
-#[cfg(not(feature = "no_std"))]
+#[cfg(feature = "std")]
 mod tests {
     #[test]
     fn self_verify_hedged() {

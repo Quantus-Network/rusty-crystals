@@ -1,38 +1,46 @@
-#![cfg_attr(feature = "no_std", no_std)]
+#![cfg_attr(not(feature = "std"), no_std)]
 
-#[cfg(feature = "no_std")]
+#[cfg(not(feature = "std"))]
 extern crate alloc;
+#[cfg(not(feature = "std"))]
 extern crate core;
 
+#[cfg(not(feature = "std"))]
+use alloc::vec;
+#[cfg(not(feature = "std"))]
+use alloc::vec::Vec;
+
+mod errors;
+pub mod fips202;
 pub mod ml_dsa_44;
 pub mod ml_dsa_65;
 pub mod ml_dsa_87;
-pub mod fips202;
 pub mod ntt;
 pub mod packing;
 pub mod params;
 pub mod poly;
 pub mod polyvec;
-pub mod rounding;
 pub mod reduce;
+pub mod rounding;
 pub mod sign;
-mod errors;
+
+pub use errors::*;
 
 pub enum PH {
     SHA256,
     SHA512,
 }
 
-#[cfg(not(feature = "no_std"))]
+#[cfg(feature = "std")]
 use rand::RngCore;
 /// Generate random bytes.
-/// 
+///
 /// # Arguments
-/// 
+///
 /// * 'bytes' - an array to fill with random data
 /// * 'n' - number of bytes to generate
-#[cfg(not(feature = "no_std"))]
-fn random_bytes(bytes: &mut [u8], n: usize) {
+#[cfg(feature = "std")]
+pub fn random_bytes(bytes: &mut [u8], n: usize) {
     rand::prelude::thread_rng()
         .try_fill_bytes(&mut bytes[..n])
         .unwrap();

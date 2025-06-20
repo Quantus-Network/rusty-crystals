@@ -1,6 +1,6 @@
 use sha2::{Sha256, Sha512, Digest};
 
-#[cfg(feature = "no_std")]
+#[cfg(not(feature = "std"))]
 use alloc::{vec, vec::Vec};
 use core::fmt;
 use crate::errors::KeyParsingError;
@@ -100,7 +100,7 @@ impl Keypair {
     /// * 'msg' - message to sign
     /// 
     /// Returns Option<Signature>
-    #[cfg(not(feature = "no_std"))]
+    #[cfg(feature = "std")]
 
     pub fn prehash_sign(&self, msg: &[u8], ctx: Option<&[u8]>, hedged: bool, ph:crate::PH) -> Option<Signature> {
         self.secret.prehash_sign(msg, ctx, hedged, ph)
@@ -200,7 +200,7 @@ impl SecretKey {
     /// * 'ph' - pre-hash function
     /// 
     /// Returns Option<Signature>
-    #[cfg(not(feature = "no_std"))]
+    #[cfg(feature = "std")]
     pub fn prehash_sign(&self, msg: &[u8], ctx: Option<&[u8]>, hedged: bool, ph:crate::PH) -> Option<Signature>  {
         let mut oid = [0u8; 11];
         let mut phm: Vec<u8> = Vec::new();
@@ -360,7 +360,7 @@ impl PublicKey {
 }
 
 #[cfg(test)]
-#[cfg(not(feature = "no_std"))]
+#[cfg(feature = "std")]
 mod tests {
     use super::Keypair;
     #[test]
