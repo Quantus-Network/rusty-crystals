@@ -1,0 +1,5 @@
+# Clippy configuration file
+# Disable warnings that are often false positives in cryptographic code
+
+# Disable too many arguments warning
+too-many-arguments-threshold = 10

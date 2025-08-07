@@ -1,15 +1,11 @@
 use bip39::{Language, Mnemonic};
-use hmac::Mac;
 use nam_tiny_hderive::{Error, bip32::ExtendedPrivKey};
-use poseidon_resonance::PoseidonHasher;
 use rand::{RngCore, rngs::OsRng};
 use rand_chacha::{
 	ChaCha20Rng,
 	rand_core::{RngCore as ChaChaCore, SeedableRng},
 };
 use rusty_crystals_dilithium::ml_dsa_87::Keypair;
-use sha2::{Sha512, digest::FixedOutput};
-use sp_core::Hasher;
 use std::str::FromStr;
 
 #[cfg(test)]
@@ -47,8 +43,6 @@ pub struct HDLattice {
 	pub master_key: [u8; 32],
 }
 
-const HARDENED_OFFSET: u32 = 0x80000000;
-const SALT: &[u8] = b"Dilithium seed";
 pub const ROOT_PATH: &str = "m";
 pub const PURPOSE: &str = "44'";
 pub const QUANTUS_DILITHIUM_CHAIN_ID: &str = "189189'";
@@ -90,7 +84,7 @@ impl HDLattice {
 
 	pub fn check_path(&self, path: &str) -> Result<(), HDLatticeError> {
 		let p = nam_tiny_hderive::bip44::DerivationPath::from_str(path)
-			.map_err(|e| HDLatticeError::GenericError(e))?;
+			.map_err(HDLatticeError::GenericError)?;
 		for element in p.iter() {
 			if !element.is_hardened() {
 				return Err(HDLatticeError::HardenedPathsOnly())
@@ -141,7 +135,7 @@ pub fn generate_mnemonic(word_count: usize) -> Result<String, HDLatticeError> {
 	let mut seed = [0u8; 32];
 
 	// Use os rng to make seed
-	OsRng::default().fill_bytes(&mut seed);
+	OsRng.fill_bytes(&mut seed);
 
 	// Use seed to initiate chacha stream and fill it
 	// NOTE: chacha will "whiten" the entropy provided by the os

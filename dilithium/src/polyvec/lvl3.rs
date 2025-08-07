@@ -31,9 +31,9 @@ impl Default for Polyvecl {
 /// Implementation of ExpandA. Generates matrix A with uniformly random coefficients a_{i,j} by
 /// performing rejection sampling on the output stream of SHAKE128(rho|j|i).
 pub fn matrix_expand(mat: &mut [Polyvecl], rho: &[u8]) {
-	for i in 0..K {
+	for (i, mat_i) in mat.iter_mut().enumerate().take(K) {
 		for j in 0..L {
-			poly::uniform(&mut mat[i].vec[j], rho, ((i << 8) + j) as u16);
+			poly::uniform(&mut mat_i.vec[j], rho, ((i << 8) + j) as u16);
 		}
 	}
 }
@@ -51,8 +51,8 @@ pub fn l_pointwise_acc_montgomery(w: &mut Poly, u: &Polyvecl, v: &Polyvecl) {
 }
 
 pub fn matrix_pointwise_montgomery(t: &mut Polyveck, mat: &[Polyvecl], v: &Polyvecl) {
-	for i in 0..K {
-		l_pointwise_acc_montgomery(&mut t.vec[i], &mat[i], v);
+	for (i, t_i) in t.vec.iter_mut().enumerate().take(K) {
+		l_pointwise_acc_montgomery(t_i, &mat[i], v);
 	}
 }
 

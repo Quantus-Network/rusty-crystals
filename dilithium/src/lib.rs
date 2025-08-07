@@ -1,4 +1,9 @@
 #![cfg_attr(feature = "no_std", no_std)]
+#![allow(clippy::identity_op)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::precedence)]
+#![allow(clippy::unnecessary_cast)]
+#![allow(clippy::enum_variant_names)]
 
 #[cfg(feature = "no_std")]
 extern crate alloc;

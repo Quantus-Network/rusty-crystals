@@ -5,7 +5,6 @@ mod helpers;
 use helpers::kat::{parse_test_vectors, TestVector};
 use rand::{thread_rng, Rng};
 use rusty_crystals_dilithium::ml_dsa_87::{Keypair, PUBLICKEYBYTES};
-use std::io::Read;
 
 fn keypair_from_test(test: &TestVector) -> Keypair {
 	let total_len = test.sk.len() + test.pk.len();
@@ -41,7 +40,7 @@ fn verify_test_vector(test: &TestVector) {
 	// Now call verify with the extracted signature
 
 	let keypair = keypair_from_test(test);
-	let result = keypair.verify(&test.msg, &signature, None);
+	let result = keypair.verify(&test.msg, signature, None);
 
 	assert!(result, "Signature verification failed",);
 

@@ -4,16 +4,10 @@ pub const SHAKE256_RATE: usize = 136;
 const NROUNDS: usize = 24;
 
 /// 1600-bit state of the algorithm, with an index of curent position.
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Default)]
 pub struct KeccakState {
 	pub s: [u64; 25],
 	pub pos: usize,
-}
-
-impl Default for KeccakState {
-	fn default() -> Self {
-		KeccakState { s: [0u64; 25], pos: 0 }
-	}
 }
 
 impl KeccakState {
@@ -381,7 +375,7 @@ fn keccak_squeeze(
 		pos = i;
 	}
 
-	return pos;
+	pos
 }
 
 /// Absorb step of Keccak; non-incremental, starts by zeroeing the state.

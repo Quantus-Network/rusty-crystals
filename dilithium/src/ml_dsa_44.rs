@@ -126,7 +126,7 @@ pub struct SecretKey {
 impl SecretKey {
 	/// Returns a copy of underlying bytes.
 	pub fn to_bytes(&self) -> [u8; SECRETKEYBYTES] {
-		self.bytes.clone()
+		self.bytes
 	}
 
 	/// Create a SecretKey from bytes.
@@ -247,7 +247,7 @@ pub struct PublicKey {
 impl PublicKey {
 	/// Returns a copy of underlying bytes.
 	pub fn to_bytes(&self) -> [u8; PUBLICKEYBYTES] {
-		self.bytes.clone()
+		self.bytes
 	}
 
 	/// Create a PublicKey from bytes.

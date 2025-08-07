@@ -23,10 +23,11 @@ pub fn decompose(a: i32) -> (i32, i32) {
 ///
 /// Returns 1 if overflow.
 pub fn make_hint(a0: i32, a1: i32) -> i32 {
-	if a0 > GAMMA2 || a0 < -GAMMA2 || (a0 == -GAMMA2 && a1 != 0) {
-		return 1;
+	if !(-GAMMA2..=GAMMA2).contains(&a0) || (a0 == -GAMMA2 && a1 != 0) {
+		1
+	} else {
+		0
 	}
-	0
 }
 
 /// Correct high bits according to hint.
@@ -35,19 +36,16 @@ pub fn make_hint(a0: i32, a1: i32) -> i32 {
 pub fn use_hint(a: i32, hint: i32) -> i32 {
 	let (a0, a1) = decompose(a);
 	if hint == 0 {
-		return a1;
-	}
-	if a0 > 0 {
+		a1
+	} else if a0 > 0 {
 		if a1 == 43 {
-			return 0;
+			0
 		} else {
-			return a1 + 1;
-		};
-	} else {
-		if a1 == 0 {
-			return 43;
-		} else {
-			return a1 - 1;
+			a1 + 1
 		}
+	} else if a1 == 0 {
+		43
+	} else {
+		a1 - 1
 	}
 }

@@ -213,7 +213,7 @@ pub fn uniform(a: &mut Poly, seed: &[u8], nonce: u16) {
 	fips202::shake128_squeezeblocks(&mut buf, UNIFORM_NBLOCKS, &mut state);
 
 	let mut buflen: usize = UNIFORM_NBLOCKS * fips202::SHAKE128_RATE;
-	let mut ctr = rej_uniform(&mut a.coeffs, N, &mut buf, buflen);
+	let mut ctr = rej_uniform(&mut a.coeffs, N, &buf, buflen);
 
 	while ctr < N {
 		let off = buflen % 3;

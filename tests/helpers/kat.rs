@@ -25,6 +25,7 @@ impl TestVector {
 		smlen: usize,
 		sm: Vec<u8>,
 	) -> Self {
+		#[allow(clippy::too_many_arguments)]
 		TestVector { count, seed, mlen, msg, pk, sk, smlen, sm }
 	}
 

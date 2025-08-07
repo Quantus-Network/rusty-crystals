@@ -3,7 +3,7 @@ use crate::{fips202, params, rounding};
 
 const UNIFORM_ETA_NBLOCKS: usize = (135 + fips202::SHAKE256_RATE) / fips202::SHAKE256_RATE;
 const UNIFORM_GAMMA1_NBLOCKS: usize =
-	(params::lvl2::POLYZ_PACKEDBYTES + fips202::SHAKE256_RATE - 1) / fips202::SHAKE256_RATE;
+	params::lvl2::POLYZ_PACKEDBYTES.div_ceil(fips202::SHAKE256_RATE);
 
 /// For all coefficients c of the input polynomial, compute high and low bits c0, c1 such c mod Q =
 /// c1*ALPHA + c0 with -ALPHA/2 < c0 <= ALPHA/2 except c1 = (Q-1)/ALPHA where we set c1 = 0 and
@@ -117,7 +117,7 @@ pub fn uniform_gamma1(a: &mut Poly, seed: &[u8], nonce: u16) {
 
 	let mut buf = [0u8; UNIFORM_GAMMA1_NBLOCKS * fips202::SHAKE256_RATE];
 	fips202::shake256_squeezeblocks(&mut buf, UNIFORM_GAMMA1_NBLOCKS, &mut state);
-	z_unpack(a, &mut buf);
+	z_unpack(a, &buf);
 }
 
 /// Implementation of H. Samples polynomial with TAU nonzero coefficients in {-1,1} using the output
