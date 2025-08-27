@@ -29,6 +29,7 @@ criterion = { version = "0.5.1", features = ["html_reports"] }
 name = "dilithium_benchmarks"
 harness = false
 
+
 [features]
 no_std = []
 default = ["dep:rand"]
