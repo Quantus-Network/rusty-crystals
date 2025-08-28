@@ -21,7 +21,6 @@ pub mod poly;
 pub mod polyvec;
 pub mod reduce;
 pub mod rounding;
-pub mod sign;
 
 pub enum PH {
 	SHA256,
