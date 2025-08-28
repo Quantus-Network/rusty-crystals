@@ -11,6 +11,7 @@ pub const KEYPAIRBYTES: usize = SECRETKEYBYTES + PUBLICKEYBYTES;
 pub type Signature = [u8; SIGNBYTES];
 
 /// A pair of private and public keys.
+#[derive(Clone)]
 #[cfg(not(feature = "no_std"))]
 pub struct Keypair {
 	pub secret: SecretKey,
@@ -117,6 +118,7 @@ impl Keypair {
 }
 
 /// Private key.
+#[derive(Clone)]
 #[cfg(not(feature = "no_std"))]
 pub struct SecretKey {
 	pub bytes: [u8; SECRETKEYBYTES],
@@ -240,6 +242,7 @@ impl SecretKey {
 	}
 }
 
+#[derive(Eq, Clone, PartialEq, Debug, Hash, PartialOrd, Ord)]
 pub struct PublicKey {
 	pub bytes: [u8; PUBLICKEYBYTES],
 }
