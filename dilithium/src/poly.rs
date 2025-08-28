@@ -1,4 +1,8 @@
 use crate::{fips202, ntt, params, reduce, rounding};
+
+#[cfg(feature = "no_std")]
+use alloc::vec::Vec;
+
 const N: usize = params::N as usize;
 const UNIFORM_NBLOCKS: usize = (767 + fips202::SHAKE128_RATE) / fips202::SHAKE128_RATE;
 const D_SHL: i32 = 1 << (params::D - 1);
@@ -209,7 +213,8 @@ pub fn uniform(a: &mut Poly, seed: &[u8], nonce: u16) {
 	let mut state = fips202::KeccakState::default();
 	fips202::shake128_stream_init(&mut state, seed, nonce);
 
-	let mut buf = [0u8; UNIFORM_NBLOCKS * fips202::SHAKE128_RATE + 2];
+	// Use heap allocation to reduce stack usage
+	let mut buf = vec![0u8; UNIFORM_NBLOCKS * fips202::SHAKE128_RATE + 2];
 	fips202::shake128_squeezeblocks(&mut buf, UNIFORM_NBLOCKS, &mut state);
 
 	let mut buflen: usize = UNIFORM_NBLOCKS * fips202::SHAKE128_RATE;

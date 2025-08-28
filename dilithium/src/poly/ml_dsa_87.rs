@@ -1,6 +1,9 @@
 use super::{Poly, N};
 use crate::{fips202, params, rounding};
 
+#[cfg(feature = "no_std")]
+use alloc::vec::Vec;
+
 const UNIFORM_ETA_NBLOCKS: usize = (135 + fips202::SHAKE256_RATE) / fips202::SHAKE256_RATE;
 const UNIFORM_GAMMA1_NBLOCKS: usize =
 	params::lvl5::POLYZ_PACKEDBYTES.div_ceil(fips202::SHAKE256_RATE);
@@ -97,7 +100,8 @@ pub fn uniform_eta(a: &mut Poly, seed: &[u8], nonce: u16) {
 	let mut state = fips202::KeccakState::default();
 	fips202::shake256_stream_init(&mut state, seed, nonce);
 
-	let mut buf = [0u8; UNIFORM_ETA_NBLOCKS * fips202::SHAKE256_RATE];
+	// Use heap allocation to reduce stack usage
+	let mut buf = vec![0u8; UNIFORM_ETA_NBLOCKS * fips202::SHAKE256_RATE];
 	fips202::shake256_squeezeblocks(&mut buf, UNIFORM_ETA_NBLOCKS, &mut state);
 
 	let buflen = UNIFORM_ETA_NBLOCKS * fips202::SHAKE256_RATE;
@@ -114,7 +118,8 @@ pub fn uniform_gamma1(a: &mut Poly, seed: &[u8], nonce: u16) {
 	let mut state = fips202::KeccakState::default();
 	fips202::shake256_stream_init(&mut state, seed, nonce);
 
-	let mut buf = [0u8; UNIFORM_GAMMA1_NBLOCKS * fips202::SHAKE256_RATE];
+	// Use heap allocation to reduce stack usage
+	let mut buf = vec![0u8; UNIFORM_GAMMA1_NBLOCKS * fips202::SHAKE256_RATE];
 	fips202::shake256_squeezeblocks(&mut buf, UNIFORM_GAMMA1_NBLOCKS, &mut state);
 	z_unpack(a, &buf);
 }
@@ -126,7 +131,8 @@ pub fn challenge(c: &mut Poly, seed: &[u8]) {
 	fips202::shake256_absorb(&mut state, seed, params::ml_dsa_87::C_DASH_BYTES);
 	fips202::shake256_finalize(&mut state);
 
-	let mut buf = [0u8; fips202::SHAKE256_RATE];
+	// Use heap allocation to reduce stack usage
+	let mut buf = vec![0u8; fips202::SHAKE256_RATE];
 	fips202::shake256_squeezeblocks(&mut buf, 1, &mut state);
 
 	let mut signs: u64 = 0;
