@@ -41,18 +41,17 @@ pub fn matrix_expand(mat: &mut [Polyvecl], rho: &[u8]) {
 /// Pointwise multiply vectors of polynomials of length L, multiply resulting vector by 2^{-32} and
 /// add (accumulate) polynomials in it. Input/output vectors are in NTT domain representation. Input
 /// coefficients are assumed to be less than 22*Q. Output coeffcient are less than 2*L*Q.
-pub fn l_pointwise_acc_montgomery(w: &mut Poly, u: &Polyvecl, v: &Polyvecl) {
+pub fn l_pointwise_acc_montgomery(w: &mut Poly, u: &Polyvecl, v: &Polyvecl, temp: &mut Poly) {
 	poly::pointwise_montgomery(w, &u.vec[0], &v.vec[0]);
-	let mut t = Poly::default();
 	for i in 1..L {
-		poly::pointwise_montgomery(&mut t, &u.vec[i], &v.vec[i]);
-		poly::add_ip(w, &t);
+		poly::pointwise_montgomery(temp, &u.vec[i], &v.vec[i]);
+		poly::add_ip(w, temp);
 	}
 }
 
-pub fn matrix_pointwise_montgomery(t: &mut Polyveck, mat: &[Polyvecl], v: &Polyvecl) {
+pub fn matrix_pointwise_montgomery(t: &mut Polyveck, mat: &[Polyvecl], v: &Polyvecl, temp: &mut Poly) {
 	for (i, t_i) in t.vec.iter_mut().enumerate().take(K) {
-		l_pointwise_acc_montgomery(t_i, &mat[i], v);
+		l_pointwise_acc_montgomery(t_i, &mat[i], v, temp);
 	}
 }
 

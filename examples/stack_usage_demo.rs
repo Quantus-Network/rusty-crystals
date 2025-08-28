@@ -160,10 +160,15 @@ fn main() {
         8,    // 8KB - very constrained
         4,    // 4KB - extremely constrained
         2,    // 2KB - minimal
+        1
     ];
 
-    println!("Stack Size | ML-DSA-44 KeyGen | ML-DSA-44 Sign | ML-DSA-44 Verify | ML-DSA-65 KeyGen | ML-DSA-65 Sign | ML-DSA-65 Verify | ML-DSA-87 KeyGen | ML-DSA-87 Sign | ML-DSA-87 Verify");
-    println!("-----------|-------------------|-----------------|-------------------|-------------------|-----------------|-------------------|-------------------|-----------------|-------------------");
+    println!("{:>10} | {:>17} | {:>15} | {:>17} | {:>17} | {:>15} | {:>17} | {:>17} | {:>15} | {:>17}",
+             "Stack Size", "ML-DSA-44 KeyGen", "ML-DSA-44 Sign", "ML-DSA-44 Verify",
+             "ML-DSA-65 KeyGen", "ML-DSA-65 Sign", "ML-DSA-65 Verify",
+             "ML-DSA-87 KeyGen", "ML-DSA-87 Sign", "ML-DSA-87 Verify");
+    println!("{:->10}-+-{:->17}-+-{:->15}-+-{:->17}-+-{:->17}-+-{:->15}-+-{:->17}-+-{:->17}-+-{:->15}-+-{:->17}",
+             "", "", "", "", "", "", "", "", "", "");
 
     let mut min_sizes = [None; 9]; // [ml44_keygen, ml44_sign, ml44_verify, ml65_keygen, ml65_sign, ml65_verify, ml87_keygen, ml87_sign, ml87_verify]
 
@@ -223,8 +228,8 @@ fn main() {
             ml87_keypair_clone2.verify(test_msg, &ml87_sig_clone, None)
         });
 
-        println!("{:>8} KB | {:>17} | {:>15} | {:>17} | {:>17} | {:>15} | {:>17} | {:>17} | {:>15} | {:>17}",
-                size_kb,
+        println!("{:>10} | {:>17} | {:>15} | {:>17} | {:>17} | {:>15} | {:>17} | {:>17} | {:>15} | {:>17}",
+                format!("{} KB", size_kb),
                 if ml44_keygen { "✅ Works" } else { "❌ Fails" },
                 if ml44_sign { "✅ Works" } else { "❌ Fails" },
                 if ml44_verify { "✅ Works" } else { "❌ Fails" },

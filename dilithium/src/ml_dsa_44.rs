@@ -37,6 +37,12 @@ struct CryptoWorkspace {
 	w1: Box<Polyveck>,
 	h: Box<Polyveck>,
 	cp: Box<Poly>,
+	// Temporary polynomials to avoid stack allocations
+	temp_poly1: Box<Poly>,
+	temp_poly2: Box<Poly>,
+	// Temporary polynomial vectors for copying operations
+	temp_polyvecl: Box<Polyvecl>,
+	temp_polyveck: Box<Polyveck>,
 }
 
 impl CryptoWorkspace {
@@ -53,6 +59,10 @@ impl CryptoWorkspace {
 			w1: Box::new(Polyveck::default()),
 			h: Box::new(Polyveck::default()),
 			cp: Box::new(Poly::default()),
+			temp_poly1: Box::new(Poly::default()),
+			temp_poly2: Box::new(Poly::default()),
+			temp_polyvecl: Box::new(Polyvecl::default()),
+			temp_polyveck: Box::new(Polyveck::default()),
 		}
 	}
 }
@@ -454,10 +464,11 @@ pub fn keypair(pk: &mut [u8], sk: &mut [u8], seed: Option<&[u8]>) {
 	crate::polyvec::lvl2::l_uniform_eta(&mut workspace.s1, &rhoprime, 0);
 	crate::polyvec::lvl2::k_uniform_eta(&mut workspace.s2, &rhoprime, L as u16);
 
-	let mut s1hat = *workspace.s1;
-	crate::polyvec::lvl2::l_ntt(&mut s1hat);
+	// Copy s1 to z using clone_from to avoid stack allocation
+	workspace.z.clone_from(&workspace.s1); // s1hat = s1
+	crate::polyvec::lvl2::l_ntt(&mut workspace.z);
 
-	crate::polyvec::lvl2::matrix_pointwise_montgomery(&mut workspace.t1, &*workspace.mat, &s1hat);
+	crate::polyvec::lvl2::matrix_pointwise_montgomery(&mut workspace.t1, &*workspace.mat, &workspace.z, &mut workspace.temp_poly1);
 	crate::polyvec::lvl2::k_reduce(&mut workspace.t1);
 	crate::polyvec::lvl2::k_invntt_tomont(&mut workspace.t1);
 	crate::polyvec::lvl2::k_add(&mut workspace.t1, &*workspace.s2);
@@ -527,9 +538,9 @@ pub fn signature(sig: &mut [u8], msg: &[u8], sk: &[u8], hedged: bool) {
 		crate::polyvec::lvl2::l_uniform_gamma1(&mut workspace.y, &rhoprime, nonce);
 		nonce += 1;
 
-		*workspace.z = *workspace.y;
+		workspace.z.clone_from(&workspace.y);
 		crate::polyvec::lvl2::l_ntt(&mut workspace.z);
-		crate::polyvec::lvl2::matrix_pointwise_montgomery(&mut workspace.w1, &*workspace.mat, &*workspace.z);
+		crate::polyvec::lvl2::matrix_pointwise_montgomery(&mut workspace.w1, &*workspace.mat, &*workspace.z, &mut workspace.temp_poly1);
 		crate::polyvec::lvl2::k_reduce(&mut workspace.w1);
 		crate::polyvec::lvl2::k_invntt_tomont(&mut workspace.w1);
 		crate::polyvec::lvl2::k_caddq(&mut workspace.w1);
@@ -642,13 +653,20 @@ pub fn verify(sig: &[u8], m: &[u8], pk: &[u8]) -> bool {
 	crate::polyvec::lvl2::matrix_expand(&mut *workspace.mat, &rho);
 
 	crate::polyvec::lvl2::l_ntt(&mut workspace.z);
-	crate::polyvec::lvl2::matrix_pointwise_montgomery(&mut workspace.w1, &*workspace.mat, &*workspace.z);
+	crate::polyvec::lvl2::matrix_pointwise_montgomery(&mut workspace.w1, &*workspace.mat, &*workspace.z, &mut workspace.temp_poly1);
 
 	crate::poly::ntt(&mut workspace.cp);
 	crate::polyvec::lvl2::k_shiftl(&mut workspace.t1);
 	crate::polyvec::lvl2::k_ntt(&mut workspace.t1);
-	let t1_2 = *workspace.t1;
-	crate::polyvec::lvl2::k_pointwise_poly_montgomery(&mut workspace.t1, &*workspace.cp, &t1_2);
+	// Copy t1 to temp_polyveck using unsafe ptr::copy to eliminate stack allocation
+	unsafe {
+		std::ptr::copy_nonoverlapping(
+			workspace.t1.vec.as_ptr(),
+			workspace.temp_polyveck.vec.as_mut_ptr(),
+			K,
+		);
+	}
+	crate::polyvec::lvl2::k_pointwise_poly_montgomery(&mut workspace.t1, &*workspace.cp, &workspace.temp_polyveck);
 
 	crate::polyvec::lvl2::k_sub(&mut workspace.w1, &*workspace.t1);
 	crate::polyvec::lvl2::k_reduce(&mut workspace.w1);
