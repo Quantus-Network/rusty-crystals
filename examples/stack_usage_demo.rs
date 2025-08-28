@@ -35,7 +35,7 @@ where
 		match handle {
 			Ok(thread_handle) => {
 				// Wait for result with timeout
-				match rx.recv_timeout(Duration::from_secs(10)) {
+				match rx.recv_timeout(Duration::from_secs(1)) {
 					Ok(success) => {
 						let _ = thread_handle.join();
 						success
@@ -74,7 +74,7 @@ where
 		match handle {
 			Ok(thread_handle) => {
 				// Wait for result with timeout
-				match rx.recv_timeout(Duration::from_secs(10)) {
+				match rx.recv_timeout(Duration::from_secs(1)) {
 					Ok(success) => {
 						let _ = thread_handle.join();
 						success
@@ -113,7 +113,7 @@ where
 		match handle {
 			Ok(thread_handle) => {
 				// Wait for result with timeout
-				match rx.recv_timeout(Duration::from_secs(10)) {
+				match rx.recv_timeout(Duration::from_secs(1)) {
 					Ok(success) => {
 						let _ = thread_handle.join();
 						success
@@ -147,25 +147,15 @@ fn main() {
 
     // Test with progressively smaller stack sizes
     let stack_sizes = [
-        2048, // 2MB - should definitely work
-        1024, // 1MB - large
-        512,  // 512KB - medium
-        384,  // 384KB
-        320,  // 320KB
-        288,  // 288KB
-        256,  // 256KB - small
-        224,  // 224KB
-        192,  // 192KB
-        160,  // 160KB
+        512,  // 512KB - should definitely work
+        256,  // 256KB - typical small embedded system
         128,  // 128KB - typical small embedded system
-        96,   // 96KB
         64,   // 64KB - large microcontroller
         32,   // 32KB - medium microcontroller
         16,   // 16KB - small microcontroller
         8,    // 8KB - very constrained
         4,    // 4KB - extremely constrained
         2,    // 2KB - minimal
-        1,    // 1KB - tiny
     ];
 
     println!("Stack Size | ML-DSA-44 KeyGen | ML-DSA-44 Sign | ML-DSA-44 Verify | ML-DSA-65 KeyGen | ML-DSA-65 Sign | ML-DSA-65 Verify | ML-DSA-87 KeyGen | ML-DSA-87 Sign | ML-DSA-87 Verify");
