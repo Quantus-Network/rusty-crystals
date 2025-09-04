@@ -1,0 +1,141 @@
+---
+name: Continuous Integration
+
+on:
+  pull_request:
+    paths-ignore:
+      - "docs/**"
+      - "*.md"
+      - "LICENSE"
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "docs/**"
+      - "*.md"
+      - "LICENSE"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_INCREMENTAL: 0
+  CARGO_TERM_COLOR: always
+
+jobs:
+  fast-checks:
+    name: 🏁 Fast Checks (Format)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install required components
+        run: rustup component add rustfmt --toolchain nightly
+      - name: Install taplo
+        run: cargo install taplo-cli --locked
+      - name: Run format checks
+        run: |
+          taplo format --check --config taplo.toml
+          cargo +nightly fmt --all -- --check
+
+  test-workspace:
+    name: 🧪 Test Workspace
+    needs: fast-checks
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+        rust:
+          - stable
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust ${{ matrix.rust }}
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust }}
+      - name: Cache cargo registry
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: Build workspace
+        run: cargo build --workspace --locked
+      - name: Test workspace
+        run: cargo test --workspace --locked
+      - name: Test workspace (release)
+        run: cargo test --workspace --locked --release
+
+  test-individual-crates:
+    name: 🔍 Test Individual Crates
+    needs: fast-checks
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        crate:
+          - rusty-crystals-dilithium
+          - rusty-crystals-hdwallet
+          - rusty-crystals
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+      - name: Cache cargo registry
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: Test ${{ matrix.crate }}
+        run: cargo test -p ${{ matrix.crate }} --locked
+      - name: Test ${{ matrix.crate }} (all features)
+        run: cargo test -p ${{ matrix.crate }} --locked --all-features
+
+  analysis:
+    name: 🤖 Analysis (Clippy & Doc)
+    needs: fast-checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rust-src
+      - name: Cache cargo registry
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: Run clippy (workspace)
+        run: cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
+      - name: Run clippy (individual crates)
+        run: |
+          cargo clippy -p rusty-crystals-dilithium --all-targets --all-features --locked -- -D warnings
+          cargo clippy -p rusty-crystals-hdwallet --all-targets --all-features --locked -- -D warnings
+          cargo clippy -p rusty-crystals --all-targets --all-features --locked -- -D warnings
+      - name: Generate documentation
+        run: cargo doc --workspace --locked --no-deps --all-features
+      - name: Check documentation
+        run: cargo doc --workspace --locked --no-deps --all-features --document-private-items
+
+  security-audit:
+    name: 🔒 Security Audit
+    needs: fast-checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install cargo-audit
+        run: cargo install cargo-audit --locked
+      - name: Run security audit
+        run: cargo audit
