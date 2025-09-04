@@ -2002,8 +2002,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4e69bf016dc406eff7d53a7d3f7cf1c2e72c82b9088aac1118591e36dd2cd3e9"
 dependencies = [
  "bitcoin_hashes",
- "rand 0.7.3",
- "rand_core 0.5.1",
+ "rand 0.8.5",
+ "rand_core 0.6.4",
  "serde",
  "unicode-normalization",
 ]
@@ -2119,50 +2119,16 @@ dependencies = [
 ]
 
 [[package]]
-name = "plonky2"
-version = "1.0.2"
-source = "git+https://github.com/Quantus-Network/plonky2#9c06fe53083dd1672951b6d5bc3aa03bde4d1a66"
-dependencies = [
- "ahash",
- "anyhow",
- "hashbrown 0.14.5",
- "itertools 0.11.0",
- "keccak-hash",
- "log",
- "num",
- "plonky2_field",
- "plonky2_maybe_rayon",
- "plonky2_util",
- "rand 0.8.5",
- "serde",
- "static_assertions",
- "unroll",
-]
-
-[[package]]
-name = "plonky2_field"
-version = "1.0.0"
-source = "git+https://github.com/Quantus-Network/plonky2#9c06fe53083dd1672951b6d5bc3aa03bde4d1a66"
-dependencies = [
- "anyhow",
- "itertools 0.11.0",
- "num",
- "plonky2_util",
- "rustc_version",
- "serde",
- "static_assertions",
- "unroll",
-]
-
-[[package]]
 name = "plonky2_maybe_rayon"
 version = "1.0.0"
-source = "git+https://github.com/Quantus-Network/plonky2#9c06fe53083dd1672951b6d5bc3aa03bde4d1a66"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9e1e554181dc95243b8d9948ae7bae5759c7fb2502fed28f671f95ef38079406"
 
 [[package]]
 name = "plonky2_util"
 version = "1.0.0"
-source = "git+https://github.com/Quantus-Network/plonky2#9c06fe53083dd1672951b6d5bc3aa03bde4d1a66"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c32c137808ca984ab2458b612b7eb0462d853ee041a3136e83d54b96074c7610"
 
 [[package]]
 name = "plotters"
@@ -2227,22 +2193,6 @@ checksum = "ba0ef0f17ad81413ea1ca5b1b67553aedf5650c88269b673d3ba015c83bc2651"
 dependencies = [
  "polkavm-derive-impl",
  "syn 2.0.106",
-]
-
-[[package]]
-name = "poseidon-resonance"
-version = "0.9.0"
-source = "git+https://github.com/Quantus-Network/poseidon-resonance#4d44267446406243e336bc7966d20452686f8347"
-dependencies = [
- "log",
- "parity-scale-codec",
- "plonky2",
- "scale-info",
- "serde",
- "sp-core",
- "sp-runtime",
- "sp-storage",
- "sp-trie",
 ]
 
 [[package]]
@@ -2324,6 +2274,62 @@ dependencies = [
  "memchr",
  "parking_lot",
  "thiserror 1.0.69",
+]
+
+[[package]]
+name = "qp-plonky2"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0ec837c755446048b155bfc7d7d955697143795a3f56f76de5e54c38bf6a5110"
+dependencies = [
+ "ahash",
+ "anyhow",
+ "hashbrown 0.14.5",
+ "itertools 0.11.0",
+ "keccak-hash",
+ "log",
+ "num",
+ "plonky2_maybe_rayon",
+ "plonky2_util",
+ "qp-plonky2-field",
+ "rand 0.8.5",
+ "serde",
+ "static_assertions",
+ "unroll",
+]
+
+[[package]]
+name = "qp-plonky2-field"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "164e15ef9e7faf721a8bcbb4b4ebe9e7f27dc915a336721a724d7e15ac6cb428"
+dependencies = [
+ "anyhow",
+ "itertools 0.11.0",
+ "num",
+ "plonky2_util",
+ "rand 0.8.5",
+ "rustc_version",
+ "serde",
+ "static_assertions",
+ "unroll",
+]
+
+[[package]]
+name = "qp-poseidon"
+version = "0.9.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9392ebae262f54125eecd98eba704e0bdfd77f710cb197ba4c89dde934414016"
+dependencies = [
+ "log",
+ "parity-scale-codec",
+ "qp-plonky2",
+ "scale-info",
+ "serde",
+ "sp-core",
+ "sp-runtime",
+ "sp-storage",
+ "sp-trie",
 ]
 
 [[package]]
@@ -2592,7 +2598,7 @@ dependencies = [
  "hex-literal",
  "hmac",
  "nam-tiny-hderive",
- "poseidon-resonance",
+ "qp-poseidon",
  "rand 0.8.5",
  "rand_chacha 0.9.0",
  "rand_core 0.6.4",
@@ -3593,7 +3599,7 @@ checksum = "97fee6b57c6a41524a810daee9286c02d7752c4253064d0b05472833a438f675"
 dependencies = [
  "cfg-if",
  "digest 0.10.7",
- "rand 0.7.3",
+ "rand 0.8.5",
  "static_assertions",
 ]
 

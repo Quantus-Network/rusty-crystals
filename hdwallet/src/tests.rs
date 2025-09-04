@@ -59,6 +59,7 @@ mod hdwallet_tests {
 		// print_keys_mnemonics_paths_as_test_vector(&vecs);
 	}
 
+	#[allow(dead_code)]
 	fn generate_test_vectors(n: u8) -> Vec<(Keypair, String, String)> {
 		(0..n)
 			.map(|_| {
@@ -71,6 +72,7 @@ mod hdwallet_tests {
 			.collect()
 	}
 
+	#[allow(dead_code)]
 	fn generate_random_path() -> String {
 		let mut rng = rand::thread_rng();
 		let length = rng.gen_range(5..15);
@@ -84,6 +86,7 @@ mod hdwallet_tests {
 	}
 
 	// Leave this in, we may need to generate new test vectors
+	#[allow(dead_code)]
 	fn print_keys_mnemonics_paths_as_test_vector(keys: &[(Keypair, String, String)]) {
 		let mut vector_str = String::from("[\n");
 		for (_i, (key, mnemonic, path)) in keys.iter().enumerate() {
@@ -242,7 +245,7 @@ mod hdwallet_tests {
 	#[test]
 	fn test_tiny_hderive_api() {
 		let mnemonic = "rocket primary way job input cactus submit menu zoo burger rent impose";
-		let hd = HDLattice::from_mnemonic(&mnemonic, None).unwrap();
+		let _hd = HDLattice::from_mnemonic(&mnemonic, None).unwrap();
 
 		// Test that nam-tiny-hderive works with our seed format
 		let seed: &[u8] = &[42; 64];

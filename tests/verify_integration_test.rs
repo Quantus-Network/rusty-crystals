@@ -125,7 +125,7 @@ fn test_verify_invalid_signature() {
 	let keys_3 = Keypair::generate(None);
 
 	// Message to sign
-	let message = b"Hello, Resonance!";
+	let message = b"Hello, Quantus!";
 	// Sign the message
 	let signature = keys_2.sign(message, None, false);
 
