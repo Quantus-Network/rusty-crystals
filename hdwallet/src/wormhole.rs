@@ -26,7 +26,7 @@
 //! The wormhole addresses provide an additional layer of privacy and security by using
 //! Poseidon hashing, which is particularly well-suited for zero-knowledge proof systems.
 
-use poseidon_resonance::{
+use qp_poseidon::{
 	PoseidonHasher, digest_bytes_to_felts, injective_bytes_to_felts, injective_string_to_felts,
 };
 use sp_core::{H256, Hasher};
