@@ -87,7 +87,7 @@ impl HDLattice {
 			.map_err(HDLatticeError::GenericError)?;
 		for element in p.iter() {
 			if !element.is_hardened() {
-				return Err(HDLatticeError::HardenedPathsOnly())
+				return Err(HDLatticeError::HardenedPathsOnly());
 			}
 		}
 		Ok(())
@@ -112,7 +112,7 @@ impl HDLattice {
 		path: &str,
 	) -> Result<WormholePair, HDLatticeError> {
 		if path.split("/").nth(2) != Some(QUANTUS_WORMHOLE_CHAIN_ID) {
-			return Err(HDLatticeError::InvalidWormholePath(path.to_string()))
+			return Err(HDLatticeError::InvalidWormholePath(path.to_string()));
 		}
 		let entropy = self.derive_entropy(path)?;
 		Ok(WormholePair::generate_pair_from_secret(&entropy))

@@ -19,16 +19,16 @@ use alloc::vec::Vec;
 /// * 'sk' - preallocated buffer for private key
 /// * 'seed' - optional seed; if None [random_bytes()] is used for randomness generation
 pub fn keypair(pk: &mut [u8], sk: &mut [u8], seed: Option<&[u8]>) {
-	let mut init_seed: Vec<u8>;
-	match seed {
-		Some(x) => init_seed = x.to_vec(),
+	let init_seed: Vec<u8> = match seed {
+		Some(x) => x.to_vec(),
 		None => {
 			#[cfg(feature = "no_std")]
 			unimplemented!("must provide entropy in verifier only mode");
 			#[cfg(not(feature = "no_std"))]
 			{
-				init_seed = vec![0u8; params::SEEDBYTES];
-				crate::random_bytes(&mut init_seed, params::SEEDBYTES)
+				let mut seed_vec = vec![0u8; params::SEEDBYTES];
+				crate::random_bytes(&mut seed_vec, params::SEEDBYTES);
+				seed_vec
 			}
 		},
 	};
@@ -110,13 +110,18 @@ pub fn signature(sig: &mut [u8], msg: &[u8], sk: &[u8], hedged: bool) {
 	fips202::shake256_finalize(&mut state);
 	fips202::shake256_squeeze(&mut keymu[params::SEEDBYTES..], params::CRHBYTES, &mut state);
 
-	let mut rnd = [0u8; params::SEEDBYTES];
-	if hedged {
+	let rnd = if hedged {
 		#[cfg(not(feature = "no_std"))]
-		crate::random_bytes(&mut rnd, params::SEEDBYTES);
+		{
+			let mut rnd_bytes = [0u8; params::SEEDBYTES];
+			crate::random_bytes(&mut rnd_bytes, params::SEEDBYTES);
+			rnd_bytes
+		}
 		#[cfg(feature = "no_std")]
 		unimplemented!("hedged mode doesn't work in verifier only mode");
-	}
+	} else {
+		[0u8; params::SEEDBYTES]
+	};
 	state.init();
 	fips202::shake256_absorb(&mut state, &keymu[..params::SEEDBYTES], params::SEEDBYTES);
 	fips202::shake256_absorb(&mut state, &rnd, params::SEEDBYTES);

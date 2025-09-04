@@ -187,7 +187,7 @@ mod tests {
 		// 5. Verify that each stage of the hash process changes the result
 		// (Create a hash with salt but without the second hashing step)
 		let mut combined = Vec::with_capacity(ADDRESS_SALT.len() + secret.len());
-		combined.extend_from_slice(&ADDRESS_SALT.as_bytes());
+		combined.extend_from_slice(ADDRESS_SALT.as_bytes());
 		combined.extend_from_slice(&secret);
 		let first_hash = PoseidonHasher::hash(&combined);
 		assert_ne!(pair.address, first_hash);

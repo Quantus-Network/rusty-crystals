@@ -81,18 +81,18 @@ fn verify_test_vector(test: &TestVector) {
 				// Zero out a random byte (only if it's not already zero)
 				let byte_index = rng.gen_range(0..fuzzed_signature.len());
 				if fuzzed_signature[byte_index] != 0 {
-					println!("Zero out byte at index {}", byte_index);
+					println!("Zero out byte at index {byte_index}");
 					fuzzed_signature[byte_index] = 0;
 				} else {
 					// If it's already zero, set it to a non-zero value
-					println!("Byte at index {} was already zero, setting to non-zero", byte_index);
+					println!("Byte at index {byte_index} was already zero, setting to non-zero");
 					fuzzed_signature[byte_index] = rng.gen_range(1..=255);
 				}
 			},
 			3 => {
 				// Modify multiple bytes (1-5 bytes)
 				let num_bytes_to_modify = rng.gen_range(1..=5.min(fuzzed_signature.len()));
-				println!("Modifying {} bytes", num_bytes_to_modify);
+				println!("Modifying {num_bytes_to_modify} bytes");
 				for _ in 0..num_bytes_to_modify {
 					let byte_index = rng.gen_range(0..fuzzed_signature.len());
 					let previous = fuzzed_signature[byte_index];

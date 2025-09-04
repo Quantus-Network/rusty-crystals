@@ -1,3 +1,5 @@
+#![allow(clippy::all)]
+
 #[cfg(test)]
 use crate::Keypair;
 use crate::tests::TestVector;

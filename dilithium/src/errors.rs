@@ -14,7 +14,7 @@ impl Display for KeyParsingError {
 			KeyParsingError::BadPublicKey => "BadPublicKey",
 			KeyParsingError::BadKeypair => "BadKeypair",
 		};
-		write!(f, "{}", str)
+		write!(f, "{str}")
 	}
 }
 

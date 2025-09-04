@@ -1,3 +1,5 @@
+#![allow(clippy::all)]
+
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]

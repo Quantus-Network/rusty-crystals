@@ -8,6 +8,7 @@ use crate::{
 	polyvec::lvl5::{Polyveck, Polyvecl},
 };
 const K: usize = params::lvl5::K;
+#[cfg(not(feature = "no_std"))]
 const L: usize = params::lvl5::L;
 
 /// Generate random bytes.
