@@ -69,34 +69,6 @@ jobs:
       - name: Test workspace
         run: cargo test --workspace --locked
 
-  test-individual-crates:
-    name: 🔍 Test Individual Crates
-    needs: fast-checks
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        crate:
-          - rusty-crystals-dilithium
-          - rusty-crystals-hdwallet
-          - rusty-crystals
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install Rust stable
-        uses: dtolnay/rust-toolchain@stable
-      - name: Cache cargo registry
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-      - name: Test ${{ matrix.crate }}
-        run: cargo test -p ${{ matrix.crate }} --locked
-      - name: Test ${{ matrix.crate }} (all features)
-        run: cargo test -p ${{ matrix.crate }} --locked --all-features
-
   analysis:
     name: 🤖 Analysis (Clippy & Doc)
     needs: fast-checks
