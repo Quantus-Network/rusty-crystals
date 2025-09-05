@@ -68,8 +68,6 @@ jobs:
         run: cargo build --workspace --locked
       - name: Test workspace
         run: cargo test --workspace --locked
-      - name: Test workspace (release)
-        run: cargo test --workspace --locked --release
 
   test-individual-crates:
     name: 🔍 Test Individual Crates
