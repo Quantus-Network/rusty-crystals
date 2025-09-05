@@ -1,6 +1,6 @@
+use crate::tests::TestVector;
 #[cfg(test)]
 use crate::Keypair;
-use crate::tests::TestVector;
 use std::{fs::File, io::Read, path::Path};
 
 #[cfg(test)]

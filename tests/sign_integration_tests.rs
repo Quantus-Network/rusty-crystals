@@ -1,6 +1,6 @@
 // tests/sign_integration_tests.rs
 
-use rusty_crystals_hdwallet::{generate_mnemonic, HDLattice};
+use qp_rusty_crystals_hdwallet::{generate_mnemonic, HDLattice};
 
 #[test]
 fn test_sign() {

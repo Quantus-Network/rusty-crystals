@@ -1,71 +1,74 @@
 # Rusty Crystals
 
-A Rust implementation of the ML-DSA (formerly "dilithium") post-quantum digital signature scheme with hierarchical deterministic (HD) wallet support.
+A Rust implementation of the ML-DSA (CRYSTALS-Dilithium) post-quantum digital signature scheme with hierarchical deterministic (HD) wallet support.
 
-Specifically, this wallet imitates BIP-32, BIP-39, and BIP-44 in its derivation of ml-dsa keys. 
-It does not support non-hardened keys because those depend on properties of elliptic curve keys not present in dilithium keys.
-
+This workspace provides post-quantum cryptographic primitives and HD wallet functionality compatible with BIP-32, BIP-39, and BIP-44 standards.
 
 ## Overview
 
-This workspace contains two crates that can be used independently or together:
+This workspace contains two independent crates:
 
-- `rusty-crystals` - Main crate that re-exports all functionality
-- `rusty-crystals-dilithium` - Key generation, signing, signature verification
-- `rusty-crystals-hdwallet` - HD wallet implementation for ML-DSA
+- **`qp-rusty-crystals-dilithium`** - ML-DSA digital signature implementation
+- **`qp-rusty-crystals-hdwallet`** - HD wallet for post-quantum keys
 
 ## Usage
 
-Add to your `Cargo.toml`:
+### ML-DSA Digital Signatures
+
 ```toml
 [dependencies]
-rusty-crystals = "0.1.0"
+qp-rusty-crystals-dilithium = "0.0.2"
 ```
 
-### Basic Example
-
 ```rust
-use rusty_crystals_dilithium::{keypair, sign, verify};
+use qp_rusty_crystals_dilithium::{ml_dsa_44, Keypair};
 
-let keypair = Keypair::generate(Some(&seed));
-let signature = keypair.sign(&msg);
-let is_verified = keypair.public.verify(&msg, &signature);
+// Generate keypair
+let keypair = ml_dsa_44::Keypair::generate(None);
+
+// Sign message
+let message = b"Hello, post-quantum world!";
+let signature = keypair.sign(message);
+
+// Verify signature
+let is_valid = keypair.public_key.verify(message, &signature);
 ```
 
-### HD Wallet Example
+### HD Wallet
+
+```toml
+[dependencies]
+qp-rusty-crystals-hdwallet = "0.0.2"
+```
 
 ```rust
-use rusty_falcon_hdwallet::{generate_mnemonic, HDLattice};
+use qp_rusty_crystals_hdwallet::{generate_mnemonic, HDLattice};
 
-// Generate a new mnemonic
-let mnemonic = generate_mnemonic(24).expect("Failed to generate mnemonic");
+// Generate mnemonic
+let mnemonic = generate_mnemonic(24)?;
 
 // Create HD wallet
-let hd = HDLattice::from_mnemonic(&mnemonic, None)
-    .expect("Failed to create HD wallet");
+let hd_wallet = HDLattice::from_mnemonic(&mnemonic, None)?;
 
-// Generate master keys
-let master_keys = hd.generate_keys();
-
-// Derive child keys
-let child_keys = hd.generate_derived_keys("0'/1'/2'")
-    .expect("Failed to derive child keys");
+// Derive keys using BIP-44 path
+let keys = hd_wallet.generate_derived_keys("44'/0'/0'/0'/0'")?;
 ```
 
-## Subcrates
+## Crates
 
-### rusty-crystals-dilithium
-Key generation functionality including:
-- Random keypair generation
-- Deterministic key generation from seed
-- Signing messages
-- Verifying signatures
+### qp-rusty-crystals-dilithium
+ML-DSA digital signature implementation:
+- **ML-DSA-44, ML-DSA-65, ML-DSA-87** - All security levels
+- **NIST Compliant** - Verified against official test vectors  
+- **Pure Rust** - Memory-safe, no unsafe code
+- **High Performance** - Optimized implementation
 
-### rusty-crystals-hdwallet
-HD wallet implementation featuring:
-- BIP39 mnemonic generation
-- Hierarchical deterministic key derivation
-- Hardened key derivation paths
+### qp-rusty-crystals-hdwallet
+Post-quantum HD wallet:
+- **BIP-39 Compatible** - Mnemonic phrase generation/restoration
+- **BIP-32 Derivation** - Hierarchical deterministic keys
+- **BIP-44 Paths** - Standard derivation paths
+- **Hardened Keys Only** - Secure post-quantum derivation
 
 
 ## Testing
@@ -103,7 +106,7 @@ This repository has 100% code coverage for all critical logic and functionality.
 
 ## License
 
-[Apache License, Version 2.0](LICENSE).
+[GPL-3.0](LICENSE) - See LICENSE file for details.
 
 ## Acknowledgements
 

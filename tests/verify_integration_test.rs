@@ -3,8 +3,8 @@
 mod helpers;
 
 use helpers::kat::{parse_test_vectors, TestVector};
+use qp_rusty_crystals_dilithium::ml_dsa_87::{Keypair, PUBLICKEYBYTES};
 use rand::{thread_rng, Rng};
-use rusty_crystals_dilithium::ml_dsa_87::{Keypair, PUBLICKEYBYTES};
 
 fn keypair_from_test(test: &TestVector) -> Keypair {
 	let total_len = test.sk.len() + test.pk.len();

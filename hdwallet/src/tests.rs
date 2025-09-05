@@ -10,14 +10,15 @@ pub struct TestVector {
 #[cfg(test)]
 mod hdwallet_tests {
 	use crate::{
-		HDLattice, HDLatticeError, generate_mnemonic,
+		generate_mnemonic,
 		test_vectors::{
 			get_test_vectors, load_known_private_keys, str_to_32_bytes, str_to_64_bytes,
 		},
+		HDLattice, HDLatticeError,
 	};
 	use nam_tiny_hderive::{bip32::ExtendedPrivKey, bip44::ChildNumber};
+	use qp_rusty_crystals_dilithium::ml_dsa_87::Keypair;
 	use rand::Rng;
-	use rusty_crystals_dilithium::ml_dsa_87::Keypair;
 	use std::str::FromStr;
 
 	#[test]

@@ -3,7 +3,7 @@
 use criterion::{criterion_group, Criterion};
 
 mod dilithium_benches {
-	use rusty_crystals_dilithium::ml_dsa_87::Keypair;
+	use qp_rusty_crystals_dilithium::ml_dsa_87::Keypair;
 
 	use super::*;
 

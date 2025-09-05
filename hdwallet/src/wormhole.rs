@@ -27,9 +27,9 @@
 //! Poseidon hashing, which is particularly well-suited for zero-knowledge proof systems.
 
 use qp_poseidon::{
-	PoseidonHasher, digest_bytes_to_felts, injective_bytes_to_felts, injective_string_to_felts,
+	digest_bytes_to_felts, injective_bytes_to_felts, injective_string_to_felts, PoseidonHasher,
 };
-use sp_core::{H256, Hasher};
+use sp_core::{Hasher, H256};
 
 /// Salt used when deriving wormhole addresses.
 pub const ADDRESS_SALT: &str = "wormhole";
@@ -59,7 +59,7 @@ impl WormholePair {
 	/// Returns `WormholeError::InvalidSecretFormat` if entropy collection fails.
 	#[cfg(feature = "std")]
 	pub fn generate_new() -> Result<WormholePair, WormholeError> {
-		use rand::{RngCore, rngs::OsRng};
+		use rand::{rngs::OsRng, RngCore};
 
 		let mut random_bytes = [0u8; 32];
 		OsRng

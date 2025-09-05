@@ -1,10 +1,23 @@
 [package]
-name = "rusty-crystals-hdwallet"
+name = "qp-rusty-crystals-hdwallet"
 version = "0.1.1"
-edition = "2024"
+edition = "2021"
+license = "GPL-3.0"
+description = "Pure Quantus RUST implementation of HD wallet functionality with post-quantum cryptography"
+readme = "README.md"
+homepage = "https://www.quantus.com"
+repository = "https://github.com/Quantus-Network/qp-rusty-crystals"
+keywords = [
+	"cryptography",
+	"hdwallet",
+	"post-quantum",
+	"quantum",
+	"quantus-network",
+]
+categories = ["cryptography"]
 
 [dependencies]
-rusty-crystals-dilithium = { path = "../dilithium" }
+qp-rusty-crystals-dilithium = { workspace = true }
 rand_core = { version = "0.6.4", default-features = false }
 sha2 = { version = "0.10.8", default-features = false }
 hmac = { version = "0.12.1", default-features = false }
