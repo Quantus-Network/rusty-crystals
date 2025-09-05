@@ -5,6 +5,7 @@ use crate::{
 	polyvec::lvl2::{Polyveck, Polyvecl},
 };
 const K: usize = params::ml_dsa_44::K;
+#[cfg(not(feature = "no_std"))]
 const L: usize = params::ml_dsa_44::L;
 
 /// Generate public and private key.

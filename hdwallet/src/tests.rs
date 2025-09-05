@@ -23,7 +23,7 @@ mod hdwallet_tests {
 	#[test]
 	fn test_from_seed() {
 		let mnemonic = "rocket primary way job input cactus submit menu zoo burger rent impose";
-		let hd1 = HDLattice::from_mnemonic(&mnemonic, None).unwrap();
+		let hd1 = HDLattice::from_mnemonic(mnemonic, None).unwrap();
 		let hd2 = HDLattice::from_seed(hd1.seed).unwrap();
 		assert_eq!(hd1.master_key, hd2.master_key);
 		assert_eq!(hd1.seed, hd2.seed);
@@ -89,21 +89,21 @@ mod hdwallet_tests {
 	#[allow(dead_code)]
 	fn print_keys_mnemonics_paths_as_test_vector(keys: &[(Keypair, String, String)]) {
 		let mut vector_str = String::from("[\n");
-		for (_i, (key, mnemonic, path)) in keys.iter().enumerate() {
+		for (key, mnemonic, path) in keys.iter() {
 			vector_str.push_str(&format!(
 				"    (Keypair::from_bytes(&*vec![{}]), \"{}\", \"{}\"),\n",
 				key.to_bytes()
 					.iter()
-					.map(|b| format!("0x{:02x}", b))
+					.map(|b| format!("0x{b:02x}"))
 					.collect::<Vec<String>>()
 					.join(", "),
 				mnemonic,
 				path
 			));
 		}
-		vector_str.push_str("]");
+		vector_str.push(']');
 
-		println!("{}", vector_str);
+		println!("{vector_str}");
 	}
 
 	#[test]
@@ -112,7 +112,7 @@ mod hdwallet_tests {
 			let hd = HDLattice::from_mnemonic(mnemonic_str, None).unwrap();
 			// println!("Deriving seed for path: {}", derivation_path);
 			// Generate keys based on the derivation path
-			let generated_keys = if derivation_path == "" {
+			let generated_keys = if derivation_path.is_empty() {
 				hd.generate_keys()
 			} else {
 				hd.generate_derived_keys(derivation_path).unwrap()
@@ -121,15 +121,13 @@ mod hdwallet_tests {
 			// Compare secret keys
 			assert_eq!(
 				generated_keys.secret.bytes, expected_keys.secret.bytes,
-				"Secret key mismatch for path: {}",
-				derivation_path
+				"Secret key mismatch for path: {derivation_path}"
 			);
 
 			// Compare public keys
 			assert_eq!(
 				generated_keys.public.bytes, expected_keys.public.bytes,
-				"Public key mismatch for path: {}",
-				derivation_path
+				"Public key mismatch for path: {derivation_path}"
 			);
 		}
 	}
@@ -139,7 +137,7 @@ mod hdwallet_tests {
 		let valid_lengths = [12, 15, 18, 21, 24];
 		for &word_count in &valid_lengths {
 			let mnemonic = generate_mnemonic(word_count)
-				.expect(&format!("Failed to generate mnemonic for {} words", word_count));
+				.unwrap_or_else(|_| panic!("Failed to generate mnemonic for {word_count} words"));
 
 			// Split mnemonic into words and count them
 			let word_count_result = mnemonic.split_whitespace().count();
@@ -147,8 +145,7 @@ mod hdwallet_tests {
 			// Assert the word count matches the expected
 			assert_eq!(
 				word_count_result, word_count,
-				"Expected {} words, but got {}",
-				word_count, word_count_result
+				"Expected {word_count} words, but got {word_count_result}"
 			);
 		}
 	}
@@ -162,17 +159,14 @@ mod hdwallet_tests {
 			// Assert that the result is an error
 			assert!(
 				result.is_err(),
-				"Expected an error for invalid word count {}, but got Ok()",
-				word_count
+				"Expected an error for invalid word count {word_count}, but got Ok()"
 			);
 
 			// Check the specific error type
 			if let Err(err) = result {
 				assert!(
 					matches!(err, HDLatticeError::BadEntropyBitCount(_)),
-					"Unexpected error type for word count {}: {:?}",
-					word_count,
-					err
+					"Unexpected error type for word count {word_count}: {err:?}"
 				);
 			}
 		}
@@ -182,7 +176,7 @@ mod hdwallet_tests {
 	fn test_derive_invalid_path() {
 		// Create a sample HDLattice instance
 		let mnemonic = "rocket primary way job input cactus submit menu zoo burger rent impose";
-		let hd = HDLattice::from_mnemonic(&mnemonic, None).unwrap();
+		let hd = HDLattice::from_mnemonic(mnemonic, None).unwrap();
 
 		// Attempt to derive a key with an invalid path
 		let result = hd.derive_entropy("abc");
@@ -198,7 +192,7 @@ mod hdwallet_tests {
 	fn test_derive_invalid_index() {
 		// Create a sample HDLattice instance
 		let mnemonic = "rocket primary way job input cactus submit menu zoo burger rent impose";
-		let hd = HDLattice::from_mnemonic(&mnemonic, None).unwrap();
+		let hd = HDLattice::from_mnemonic(mnemonic, None).unwrap();
 
 		// Attempt to derive a key with an invalid index
 		let result = hd.derive_entropy("m/2147483648'"); // Index exceeds HARDENED_OFFSET (2^31)
@@ -214,7 +208,7 @@ mod hdwallet_tests {
 	#[test]
 	fn test_derive_with_non_integer_path() {
 		let mnemonic = "rocket primary way job input cactus submit menu zoo burger rent impose";
-		let hd = HDLattice::from_mnemonic(&mnemonic, None).unwrap();
+		let hd = HDLattice::from_mnemonic(mnemonic, None).unwrap();
 
 		// Valid derivation path with multiple levels
 		let result = hd.derive_entropy("1/a/2");
@@ -231,7 +225,7 @@ mod hdwallet_tests {
 	fn test_generate_derived_keys_0() {
 		// Rename test since it's no longer about 'm' path
 		let mnemonic = "rocket primary way job input cactus submit menu zoo burger rent impose";
-		let hd = HDLattice::from_mnemonic(&mnemonic, None).unwrap();
+		let hd = HDLattice::from_mnemonic(mnemonic, None).unwrap();
 
 		// Test with empty string instead of "m"
 		let derived_key_0 = hd.derive_entropy("m").unwrap();
@@ -245,7 +239,7 @@ mod hdwallet_tests {
 	#[test]
 	fn test_tiny_hderive_api() {
 		let mnemonic = "rocket primary way job input cactus submit menu zoo burger rent impose";
-		let _hd = HDLattice::from_mnemonic(&mnemonic, None).unwrap();
+		let _hd = HDLattice::from_mnemonic(mnemonic, None).unwrap();
 
 		// Test that nam-tiny-hderive works with our seed format
 		let seed: &[u8] = &[42; 64];
@@ -261,7 +255,7 @@ mod hdwallet_tests {
 	#[test]
 	fn test_wormhole_derivation() {
 		let mnemonic = "rocket primary way job input cactus submit menu zoo burger rent impose";
-		let hd = HDLattice::from_mnemonic(&mnemonic, None).unwrap();
+		let hd = HDLattice::from_mnemonic(mnemonic, None).unwrap();
 
 		let result = hd.generate_wormhole_pair_from_path("m/44'/60'/0'");
 		assert!(result.is_err());
@@ -276,7 +270,7 @@ mod hdwallet_tests {
 	#[test]
 	fn test_master_key_from_seed() {
 		let mnemonic = "rocket primary way job input cactus submit menu zoo burger rent impose";
-		let hd = HDLattice::from_mnemonic(&mnemonic, None).unwrap();
+		let hd = HDLattice::from_mnemonic(mnemonic, None).unwrap();
 		let master = HDLattice::master_key_from_seed(&hd.seed).unwrap();
 		assert_eq!(master, hd.master_key, "Master key from seed should match the master key");
 	}
@@ -287,9 +281,9 @@ mod hdwallet_tests {
 
 		// For demonstration: print the parsed vectors
 		for vector in vectors {
-			println!("{:?}", vector);
+			println!("{vector:?}");
 			let hd = HDLattice::from_seed(str_to_64_bytes(&vector.seed)).unwrap();
-			let entropy = hd.derive_entropy(&*vector.path).unwrap();
+			let entropy = hd.derive_entropy(&vector.path).unwrap();
 			assert_eq!(
 				entropy,
 				str_to_32_bytes(&vector.private_key),

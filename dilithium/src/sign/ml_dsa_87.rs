@@ -19,6 +19,7 @@ use alloc::vec::Vec;
 /// * 'sk' - preallocated buffer for private key
 /// * 'seed' - optional seed; if None [random_bytes()] is used for randomness generation
 pub fn keypair(pk: &mut [u8], sk: &mut [u8], seed: Option<&[u8]>) {
+	#[allow(unused_mut)]
 	let mut init_seed: Vec<u8>;
 	match seed {
 		Some(x) => init_seed = x.to_vec(),
@@ -110,6 +111,7 @@ pub fn signature(sig: &mut [u8], msg: &[u8], sk: &[u8], hedged: bool) {
 	fips202::shake256_finalize(&mut state);
 	fips202::shake256_squeeze(&mut keymu[params::SEEDBYTES..], params::CRHBYTES, &mut state);
 
+	#[allow(unused_mut)]
 	let mut rnd = [0u8; params::SEEDBYTES];
 	if hedged {
 		#[cfg(not(feature = "no_std"))]
