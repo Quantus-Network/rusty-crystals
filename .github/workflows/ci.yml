@@ -119,11 +119,6 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - name: Run clippy (workspace)
         run: cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
-      - name: Run clippy (individual crates)
-        run: |
-          cargo clippy -p rusty-crystals-dilithium --all-targets --all-features --locked -- -D warnings
-          cargo clippy -p rusty-crystals-hdwallet --all-targets --all-features --locked -- -D warnings
-          cargo clippy -p rusty-crystals --all-targets --all-features --locked -- -D warnings
       - name: Generate documentation
         run: cargo doc --workspace --locked --no-deps --all-features
       - name: Check documentation
