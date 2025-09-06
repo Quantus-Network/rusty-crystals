@@ -2344,7 +2344,7 @@ dependencies = [
 
 [[package]]
 name = "qp-rusty-crystals-dilithium"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "criterion",
  "rand 0.7.3",
