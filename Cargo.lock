@@ -2353,7 +2353,7 @@ dependencies = [
 
 [[package]]
 name = "qp-rusty-crystals-hdwallet"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "bip39",
  "hex",
